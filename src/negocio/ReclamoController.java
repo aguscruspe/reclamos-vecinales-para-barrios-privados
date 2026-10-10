@@ -208,7 +208,7 @@ public class ReclamoController {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
             } // Pausa
-            crearReclamo(TipoReclamo.BACHE, "Bache peligroso", "Av. Siempre Viva 742");
+            crearReclamo(TipoReclamo.ELECTRICIDAD, "No funciona la luminaria de la esquina", "Calle 5 y Calle 8");
             logout();
 
             // Guardamos los usuarios (admin/empleado) que no se guardaron con

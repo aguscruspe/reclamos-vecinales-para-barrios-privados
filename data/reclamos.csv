@@ -1,6 +1,3 @@
-1;BACHE;Bache peligroso;Av. Siempre Viva 742;1;2
-2;SEMAFORO;hola;floresta;1;2
-3;SEMAFORO;hola;adrogue;1;2
-4;ALUMBRADO_PUBLICO;hola;banfield;1;2
-5;BACHE;hay un bache en la calle san juan;san juan;4;2
-6;SEMAFORO;no anda un semaforo;lima;5;2
+1;ELECTRICIDAD;No funciona la luminaria de la esquina;Calle 5 y Calle 8;1;2
+2;PODA;Rama a punto de caer sobre la vereda;Plaza central;4;7
+3;VELOCIDAD_EXCESIVA;Autos a alta velocidad cerca del club house;Club house;5;0
