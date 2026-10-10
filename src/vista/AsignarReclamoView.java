@@ -1,5 +1,6 @@
 package vista;
 
+import excepts.AsignacionInvalidaException;
 import excepts.PersistenciaException;
 import excepts.ReclamoNoEncontradoException;
 import excepts.UsuarioNoValidoException;
@@ -35,13 +36,14 @@ public class AsignarReclamoView extends JDialog {
         JPanel panelFormulario = new JPanel(new GridLayout(1, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // 1. Obtenemos los nombres completos de todos los Empleados Municipales
+        // 1. Obtenemos solo los empleados del área que corresponde al tipo de reclamo
         String[] nombresCompletosEmpleados = sistema.getTodosLosUsuarios().values().stream()
                 .filter(u -> u instanceof Empleado)
+                .filter(u -> ((Empleado) u).getArea() == reclamo.getTipo().getArea())
                 .map(Usuario::getNombreCompleto)
                 .toArray(String[]::new);
 
-        panelFormulario.add(new JLabel("Asignar a Empleado:"));
+        panelFormulario.add(new JLabel("Empleado (" + reclamo.getTipo().getArea() + "):"));
 
         // Creamos el ComboBox con los nombres
         comboBoxEmpleado = new JComboBox<>(nombresCompletosEmpleados);
@@ -93,7 +95,8 @@ public class AsignarReclamoView extends JDialog {
 
             this.dispose();
 
-        } catch (UsuarioNoValidoException | ReclamoNoEncontradoException | PersistenciaException ex) {
+        } catch (UsuarioNoValidoException | ReclamoNoEncontradoException | PersistenciaException
+                 | AsignacionInvalidaException ex) {
             JOptionPane.showMessageDialog(this,
                     "Error al asignar el reclamo: " + ex.getMessage(),
                     "Error del Sistema", JOptionPane.ERROR_MESSAGE);

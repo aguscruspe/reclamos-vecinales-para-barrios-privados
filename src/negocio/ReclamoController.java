@@ -125,7 +125,8 @@ public class ReclamoController {
     }
 
     public void asignarReclamo(int idReclamo, String usernameEmpleado)
-            throws UsuarioNoValidoException, ReclamoNoEncontradoException, PersistenciaException {
+            throws UsuarioNoValidoException, ReclamoNoEncontradoException, PersistenciaException,
+            AsignacionInvalidaException {
         if (!(usuarioLogueado instanceof Intendente)) {
             throw new UsuarioNoValidoException("Solo el intendente puede asignar reclamos.");
         }

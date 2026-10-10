@@ -1,5 +1,6 @@
 package model;
 
+import excepts.AsignacionInvalidaException;
 import model.enums.EstadoReclamo;
 import model.enums.TipoReclamo;
 import java.util.ArrayList;
@@ -73,7 +74,15 @@ public class Reclamo {
         return historial.get(historial.size() - 1).getEstado();
     }
 
-    public void asignarEmpleado(Empleado empleado, String observacion) {
+    /**
+     * Regla del barrio: un reclamo solo se puede asignar a un empleado
+     * del área que corresponde a su tipo (ej.: PODA -> JARDINERIA).
+     */
+    public void asignarEmpleado(Empleado empleado, String observacion) throws AsignacionInvalidaException {
+        if (empleado.getArea() != tipo.getArea()) {
+            throw new AsignacionInvalidaException("Un reclamo de tipo " + tipo + " corresponde al área "
+                    + tipo.getArea() + ", pero el empleado es del área " + empleado.getArea() + ".");
+        }
         this.empleadoAsignado = empleado;
         agregarHistorial(EstadoReclamo.ASIGNADO, observacion);
     }

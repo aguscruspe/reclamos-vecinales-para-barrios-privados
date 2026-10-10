@@ -1,5 +1,6 @@
 package negocio;
 
+import excepts.AsignacionInvalidaException;
 import excepts.ReclamoNoEncontradoException;
 import excepts.UsuarioNoValidoException;
 import model.Empleado;
@@ -40,8 +41,8 @@ public class ReclamoService {
         return nuevoReclamo;
     }
 
-    public void asignarReclamo(int idReclamo, String usernameEmpleado, String adminUsername)
-            throws ReclamoNoEncontradoException, UsuarioNoValidoException {
+    public void asignarReclamo(int idReclamo, String usernameEmpleado, String usernameIntendente)
+            throws ReclamoNoEncontradoException, UsuarioNoValidoException, AsignacionInvalidaException {
 
         Reclamo reclamo = reclamos.get(idReclamo);
         if (reclamo == null) {
@@ -56,7 +57,7 @@ public class ReclamoService {
         Empleado empleado = (Empleado) u;
 
         // Delegamos la lógica al experto (Information Expert)
-        reclamo.asignarEmpleado(empleado, "Asignado por " + adminUsername);
+        reclamo.asignarEmpleado(empleado, "Asignado por " + usernameIntendente);
     }
 
     public void actualizarEstadoReclamo(int idReclamo, EstadoReclamo nuevoEstado, String observacion, Usuario usuarioQueActualiza)
