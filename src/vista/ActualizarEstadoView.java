@@ -5,14 +5,14 @@ import excepts.ReclamoNoEncontradoException;
 import excepts.UsuarioNoValidoException;
 import model.Reclamo;
 import model.enums.EstadoReclamo;
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ActualizarEstadoView extends JDialog {
 
-    private SistemaGestionReclamos sistema;
+    private ReclamoController sistema;
     private Reclamo reclamoAActualizar;
 
     // Componentes del formulario
@@ -20,7 +20,7 @@ public class ActualizarEstadoView extends JDialog {
     private JTextField txtObservacion;
     private JButton btnGuardar;
 
-    public ActualizarEstadoView(JFrame parent, SistemaGestionReclamos sistema, Reclamo reclamo) {
+    public ActualizarEstadoView(JFrame parent, ReclamoController sistema, Reclamo reclamo) {
         // 'super' para configurar el JDialog como modal
         super(parent, "Actualizar Estado Reclamo (ID: " + reclamo.getId() + ")", true);
 
@@ -68,7 +68,7 @@ public class ActualizarEstadoView extends JDialog {
         String observacion = txtObservacion.getText();
 
         if (observacion.trim().isEmpty()) {
-            observacion = "Actualizado por " + sistema.getUsuarioLogueado().getUsername();
+            observacion = "Actualizado por " + sistema.getUsuarioLogueado().getNombreUsuario();
         }
 
         try {

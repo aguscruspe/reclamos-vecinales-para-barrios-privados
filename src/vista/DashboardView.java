@@ -3,7 +3,7 @@ package vista;
 import excepts.ReclamoNoEncontradoException;
 import model.Reclamo;
 import model.Usuario;
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DashboardView extends JFrame {
 
-    private SistemaGestionReclamos sistema;
+    private ReclamoController sistema;
     private Usuario usuarioLogueado;
 
     // Componentes de la GUI
@@ -22,12 +22,12 @@ public class DashboardView extends JFrame {
     private JButton btnAsignar;
     private JButton btnActualizarEstado;
 
-    public DashboardView(SistemaGestionReclamos sistema) {
+    public DashboardView(ReclamoController sistema) {
         this.sistema = sistema;
         this.usuarioLogueado = sistema.getUsuarioLogueado();
 
         // --- Configuración de la Ventana ---
-        setTitle("Dashboard - Sistema de Reclamos (" + usuarioLogueado.getUsername() + ")");
+        setTitle("Dashboard - Sistema de Reclamos (" + usuarioLogueado.getNombreUsuario() + ")");
         setSize(950, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -83,10 +83,10 @@ public class DashboardView extends JFrame {
         // Lógica de visibilidad de botones
         if (usuarioLogueado instanceof model.Vecino) {
             panelBotones.add(btnNuevoReclamo);
-        } else if (usuarioLogueado instanceof model.Administrador) {
+        } else if (usuarioLogueado instanceof model.Intendente) {
             panelBotones.add(btnAsignar);
             panelBotones.add(btnActualizarEstado);
-        } else if (usuarioLogueado instanceof model.EmpleadoMunicipal) {
+        } else if (usuarioLogueado instanceof model.Empleado) {
             panelBotones.add(btnActualizarEstado);
         }
 
@@ -140,7 +140,7 @@ public class DashboardView extends JFrame {
             });
         }
 
-        // 3. Conectamos "Asignar Reclamo Seleccionado" (Administrador)
+        // 3. Conectamos "Asignar Reclamo Seleccionado" (Intendente)
         if (btnAsignar != null) {
             btnAsignar.addActionListener(e -> {
 
@@ -186,10 +186,10 @@ public class DashboardView extends JFrame {
             // Si es Vecino, trae solo SUS reclamos
             reclamos = sistema.getReclamosPorVecino((model.Vecino) this.usuarioLogueado);
 
-        } else if (this.usuarioLogueado instanceof model.EmpleadoMunicipal) {
+        } else if (this.usuarioLogueado instanceof model.Empleado) {
             // Si es Empleado, trae solo los ASIGNADOS A ÉL
             // (Una mejora lógica adicional, la profesora lo apreciará)
-            reclamos = sistema.getReclamosPorEmpleado((model.EmpleadoMunicipal) this.usuarioLogueado);
+            reclamos = sistema.getReclamosPorEmpleado((model.Empleado) this.usuarioLogueado);
 
         } else {
             // Si es Admin (u otro tipo), trae TODOS
@@ -204,14 +204,14 @@ public class DashboardView extends JFrame {
                     ? r.getEmpleadoAsignado().getNombreCompleto()
                     : "N/A";
 
-            String vecinoReporta = r.getVecinoReporta().getNombreCompleto();
+            String vecino = r.getVecino().getNombreCompleto();
 
             Object[] fila = {
                     r.getId(),
                     r.getFechaCreacion().format(formatter),
                     r.getTipo(),
                     r.getEstadoActual(),
-                    vecinoReporta,
+                    vecino,
                     empleadoAsignado,
                     r.getUbicacion()
             };

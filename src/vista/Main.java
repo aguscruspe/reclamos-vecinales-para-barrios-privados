@@ -1,7 +1,7 @@
 package vista;
 
 import excepts.PersistenciaException;
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 import repo.GestorPersistencia;
 import repo.IRepositorio;
 import javax.swing.SwingUtilities;
@@ -12,7 +12,7 @@ public class Main {
 
         // 1. Inyección de Dependencias (Igual que antes)
         IRepositorio repositorio = new GestorPersistencia();
-        SistemaGestionReclamos sistema = new SistemaGestionReclamos(repositorio);
+        ReclamoController sistema = new ReclamoController(repositorio);
 
         try {
             // 2. Carga inicial del sistema (Igual que antes)

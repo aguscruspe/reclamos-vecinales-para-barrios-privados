@@ -3,24 +3,24 @@ package vista;
 import excepts.PersistenciaException;
 import excepts.ReclamoNoEncontradoException;
 import excepts.UsuarioNoValidoException;
-import model.EmpleadoMunicipal;
+import model.Empleado;
 import model.Reclamo;
 import model.Usuario;
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class AsignarReclamoView extends JDialog {
 
-    private SistemaGestionReclamos sistema;
+    private ReclamoController sistema;
     private Reclamo reclamoAAsignar;
 
     // Componentes del formulario
     private JComboBox<String> comboBoxEmpleado;
     private JButton btnAsignar;
 
-    public AsignarReclamoView(JFrame parent, SistemaGestionReclamos sistema, Reclamo reclamo) {
+    public AsignarReclamoView(JFrame parent, ReclamoController sistema, Reclamo reclamo) {
         super(parent, "Asignar Reclamo (ID: " + reclamo.getId() + ")", true);
 
         this.sistema = sistema;
@@ -37,7 +37,7 @@ public class AsignarReclamoView extends JDialog {
 
         // 1. Obtenemos los nombres completos de todos los Empleados Municipales
         String[] nombresCompletosEmpleados = sistema.getTodosLosUsuarios().values().stream()
-                .filter(u -> u instanceof EmpleadoMunicipal)
+                .filter(u -> u instanceof Empleado)
                 .map(Usuario::getNombreCompleto)
                 .toArray(String[]::new);
 
@@ -77,12 +77,12 @@ public class AsignarReclamoView extends JDialog {
         try {
             // 1. Buscamos el USERNAME asociado al nombre completo (para llamar al Backend)
             String usernameEmpleado = sistema.getTodosLosUsuarios().values().stream()
-                    .filter(u -> u instanceof EmpleadoMunicipal)
+                    .filter(u -> u instanceof Empleado)
                     .filter(u -> u.getNombreCompleto().equals(nombreCompletoEmpleadoSeleccionado))
-                    .map(Usuario::getUsername)
+                    .map(Usuario::getNombreUsuario)
                     .findFirst()
                     .orElseThrow(() -> new UsuarioNoValidoException(
-                            "Error interno: No se pudo encontrar el username del empleado."));
+                            "Error interno: No se pudo encontrar el nombreUsuario del empleado."));
 
             // 2. Llama a la lógica de negocio (Backend) con el USERNAME
             sistema.asignarReclamo(reclamoAAsignar.getId(), usernameEmpleado);

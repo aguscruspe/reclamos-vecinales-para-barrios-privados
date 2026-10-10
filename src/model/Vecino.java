@@ -6,14 +6,14 @@ public class Vecino extends Usuario {
 
     private String direccion;
 
-    public Vecino(String username, String password, String nombreCompleto, String dni, String direccion) {
-        super(username, password, nombreCompleto, dni);
+    public Vecino(String nombreUsuario, String password, String nombreCompleto, String dni, String direccion) {
+        super(nombreUsuario, password, nombreCompleto, dni);
         this.direccion = direccion;
     }
 
     // Constructor para carga desde persistencia
-    public Vecino(int id, String username, String password, String nombreCompleto, String dni, String direccion) {
-        super(id, username, password, nombreCompleto, dni);
+    public Vecino(int id, String nombreUsuario, String password, String nombreCompleto, String dni, String direccion) {
+        super(id, nombreUsuario, password, nombreCompleto, dni);
         this.direccion = direccion;
     }
 
@@ -32,7 +32,7 @@ public class Vecino extends Usuario {
      */
     @Override
     public void validar() throws UsuarioNoValidoException {
-        if (username == null || username.trim().isEmpty() ||
+        if (nombreUsuario == null || nombreUsuario.trim().isEmpty() ||
                 password == null || password.trim().isEmpty() ||
                 dni == null || dni.trim().isEmpty() ||
                 direccion == null || direccion.trim().isEmpty()) {

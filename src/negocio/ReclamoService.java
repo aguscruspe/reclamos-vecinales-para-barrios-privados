@@ -2,12 +2,12 @@ package negocio;
 
 import excepts.ReclamoNoEncontradoException;
 import excepts.UsuarioNoValidoException;
-import model.EmpleadoMunicipal;
+import model.Empleado;
 import model.Reclamo;
 import model.Usuario;
 import model.Vecino;
 import model.enums.EstadoReclamo;
-import model.enums.SectorEmpleado;
+import model.enums.AreaEmpleado;
 import model.enums.TipoReclamo;
 
 import java.util.ArrayList;
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
  * SRP: Esta clase tiene la única responsabilidad de gestionar la lógica
  * de negocio relacionada con los Reclamos.
  */
-public class ServicioReclamos {
+public class ReclamoService {
 
     private Map<Integer, Reclamo> reclamos; // Referencia al mapa principal
     private Map<String, Usuario> usuarios; // Necesaria para buscar empleados
 
-    public ServicioReclamos(Map<Integer, Reclamo> reclamos, Map<String, Usuario> usuarios) {
+    public ReclamoService(Map<Integer, Reclamo> reclamos, Map<String, Usuario> usuarios) {
         this.reclamos = reclamos;
         this.usuarios = usuarios;
     }
@@ -49,11 +49,11 @@ public class ServicioReclamos {
         }
 
         Usuario u = usuarios.get(usernameEmpleado);
-        if (u == null || !(u instanceof EmpleadoMunicipal)) {
-            throw new UsuarioNoValidoException("No se encontró un empleado con el username: " + usernameEmpleado);
+        if (u == null || !(u instanceof Empleado)) {
+            throw new UsuarioNoValidoException("No se encontró un empleado con el nombreUsuario: " + usernameEmpleado);
         }
 
-        EmpleadoMunicipal empleado = (EmpleadoMunicipal) u;
+        Empleado empleado = (Empleado) u;
 
         // Delegamos la lógica al experto (Information Expert)
         reclamo.asignarEmpleado(empleado, "Asignado por " + adminUsername);
@@ -68,7 +68,7 @@ public class ServicioReclamos {
         }
 
         // Si es un empleado, solo puede gestionar sus reclamos asignados
-        if (usuarioQueActualiza instanceof EmpleadoMunicipal) {
+        if (usuarioQueActualiza instanceof Empleado) {
             if (reclamo.getEmpleadoAsignado() == null
                     || reclamo.getEmpleadoAsignado().getId() != usuarioQueActualiza.getId()) {
                 throw new UsuarioNoValidoException("Este reclamo no está asignado a usted.");
@@ -77,7 +77,7 @@ public class ServicioReclamos {
 
         // Delegamos al experto
         reclamo.actualizarEstado(nuevoEstado,
-                observacion + " (Actualizado por: " + usuarioQueActualiza.getUsername() + ")");
+                observacion + " (Actualizado por: " + usuarioQueActualiza.getNombreUsuario() + ")");
     }
 
     // --- Métodos de Consulta ---
@@ -88,11 +88,11 @@ public class ServicioReclamos {
 
     public List<Reclamo> getReclamosPorVecino(Vecino vecino) {
         return reclamos.values().stream()
-                .filter(r -> r.getVecinoReporta().getId() == vecino.getId())
+                .filter(r -> r.getVecino().getId() == vecino.getId())
                 .collect(Collectors.toList());
     }
 
-    public List<Reclamo> getReclamosPorEmpleado(EmpleadoMunicipal empleado) {
+    public List<Reclamo> getReclamosPorEmpleado(Empleado empleado) {
         return reclamos.values().stream()
                 .filter(r -> r.getEmpleadoAsignado() != null && r.getEmpleadoAsignado().getId() == empleado.getId())
                 .collect(Collectors.toList());
@@ -104,10 +104,10 @@ public class ServicioReclamos {
                 .collect(Collectors.toList());
     }
 
-    public Set<SectorEmpleado> getSectoresConReclamosAsignados() {
+    public Set<AreaEmpleado> getAreasConReclamosAsignados() {
         return reclamos.values().stream()
                 .filter(r -> r.getEmpleadoAsignado() != null)
-                .map(r -> r.getEmpleadoAsignado().getSector())
+                .map(r -> r.getEmpleadoAsignado().getArea())
                 .collect(Collectors.toSet());
     }
 }

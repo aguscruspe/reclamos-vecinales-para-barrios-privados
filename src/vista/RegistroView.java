@@ -2,14 +2,14 @@ package vista;
 
 import excepts.PersistenciaException;
 import excepts.UsuarioNoValidoException;
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class RegistroView extends JDialog {
 
-    private SistemaGestionReclamos sistema;
+    private ReclamoController sistema;
 
     // Componentes del formulario
     private JTextField txtUsername;
@@ -19,7 +19,7 @@ public class RegistroView extends JDialog {
     private JTextField txtDireccion;
     private JButton btnRegistrar;
 
-    public RegistroView(Frame parent, SistemaGestionReclamos sistema) {
+    public RegistroView(Frame parent, ReclamoController sistema) {
         super(parent, "Registro de Nuevo Vecino", true); // true = MODAL
         this.sistema = sistema;
 
@@ -67,7 +67,7 @@ public class RegistroView extends JDialog {
     }
 
     private void handleRegistrarVecino() {
-        String username = txtUsername.getText();
+        String nombreUsuario = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
         String nombre = txtNombreCompleto.getText();
         String dni = txtDni.getText();
@@ -75,7 +75,7 @@ public class RegistroView extends JDialog {
 
         try {
             // Llamamos a la nueva función en la fachada
-            sistema.registrarVecino(username, password, nombre, dni, direccion);
+            sistema.registrarVecino(nombreUsuario, password, nombre, dni, direccion);
 
             JOptionPane.showMessageDialog(this,
                     "¡Registro exitoso! Ya puede iniciar sesión.",
@@ -84,7 +84,7 @@ public class RegistroView extends JDialog {
             this.dispose(); // Cierra la ventana de registro
 
         } catch (UsuarioNoValidoException ex) {
-            // Captura errores de validación (datos incompletos, username duplicado)
+            // Captura errores de validación (datos incompletos, nombreUsuario duplicado)
             JOptionPane.showMessageDialog(this,
                     "Error de Validación: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);

@@ -16,23 +16,23 @@ import java.util.Set;
  * Es el único punto de entrada para la capa de Vista.
  * Delega la lógica de negocio a servicios especializados (SRP).
  */
-public class SistemaGestionReclamos {
+public class ReclamoController {
 
     // Capa de Persistencia
     private IRepositorio repositorio;
 
     // Servicios de Lógica de Negocio
-    private ServicioUsuarios servicioUsuarios;
-    private ServicioReclamos servicioReclamos;
+    private UsuarioService usuarioService;
+    private ReclamoService reclamoService;
 
     // Estado en memoria
-    private Map<String, Usuario> usuarios; // Acceso rápido por username
+    private Map<String, Usuario> usuarios; // Acceso rápido por nombreUsuario
     private Map<Integer, Reclamo> reclamos; // Acceso rápido por ID
 
     // Estado de Sesión
     private Usuario usuarioLogueado;
 
-    public SistemaGestionReclamos(IRepositorio repositorio) {
+    public ReclamoController(IRepositorio repositorio) {
         this.repositorio = repositorio;
         this.usuarioLogueado = null;
     }
@@ -43,8 +43,8 @@ public class SistemaGestionReclamos {
         this.reclamos = repositorio.cargarReclamos(this.usuarios);
 
         // Inyectar los mapas en los servicios
-        this.servicioUsuarios = new ServicioUsuarios(this.usuarios);
-        this.servicioReclamos = new ServicioReclamos(this.reclamos, this.usuarios);
+        this.usuarioService = new UsuarioService(this.usuarios);
+        this.reclamoService = new ReclamoService(this.reclamos, this.usuarios);
 
         System.out.println(
                 "Sistema iniciado. " + usuarios.size() + " usuarios y " + reclamos.size() + " reclamos cargados.");
@@ -59,9 +59,9 @@ public class SistemaGestionReclamos {
 
     // --- Gestión de Sesión ---
 
-    public boolean login(String username, String password) {
+    public boolean login(String nombreUsuario, String password) {
         // Delega la autenticación al servicio
-        Usuario u = servicioUsuarios.autenticar(username, password);
+        Usuario u = usuarioService.autenticar(nombreUsuario, password);
         if (u != null) {
             this.usuarioLogueado = u;
             return true;
@@ -78,11 +78,11 @@ public class SistemaGestionReclamos {
     }
 
     // --- (NUEVO) Lógica de Registro (Corrección #2) ---
-    public Vecino registrarVecino(String username, String password, String nombreCompleto, String dni, String direccion)
+    public Vecino registrarVecino(String nombreUsuario, String password, String nombreCompleto, String dni, String direccion)
             throws UsuarioNoValidoException, PersistenciaException {
 
         // 1. Delega la creación y validación al servicio
-        Vecino nuevoVecino = servicioUsuarios.registrarVecino(username, password, nombreCompleto, dni, direccion);
+        Vecino nuevoVecino = usuarioService.registrarVecino(nombreUsuario, password, nombreCompleto, dni, direccion);
 
         // 2. La fachada se encarga de persistir
         guardarCambios();
@@ -101,7 +101,7 @@ public class SistemaGestionReclamos {
         Vecino vecino = (Vecino) usuarioLogueado;
 
         // 1. Delega la creación al servicio
-        Reclamo nuevoReclamo = servicioReclamos.crearReclamo(tipo, descripcion, ubicacion, vecino);
+        Reclamo nuevoReclamo = reclamoService.crearReclamo(tipo, descripcion, ubicacion, vecino);
 
         // 2. La fachada persiste
         guardarCambios();
@@ -112,12 +112,12 @@ public class SistemaGestionReclamos {
 
     public void asignarReclamo(int idReclamo, String usernameEmpleado)
             throws UsuarioNoValidoException, ReclamoNoEncontradoException, PersistenciaException {
-        if (!(usuarioLogueado instanceof Administrador)) {
-            throw new UsuarioNoValidoException("Solo los administradores pueden asignar reclamos.");
+        if (!(usuarioLogueado instanceof Intendente)) {
+            throw new UsuarioNoValidoException("Solo el intendente puede asignar reclamos.");
         }
 
         // 1. Delega la asignación al servicio
-        servicioReclamos.asignarReclamo(idReclamo, usernameEmpleado, usuarioLogueado.getUsername());
+        reclamoService.asignarReclamo(idReclamo, usernameEmpleado, usuarioLogueado.getNombreUsuario());
 
         // 2. La fachada persiste
         guardarCambios();
@@ -132,7 +132,7 @@ public class SistemaGestionReclamos {
         }
 
         // 1. Delega la actualización al servicio
-        servicioReclamos.actualizarEstadoReclamo(idReclamo, nuevoEstado, observacion, usuarioLogueado);
+        reclamoService.actualizarEstadoReclamo(idReclamo, nuevoEstado, observacion, usuarioLogueado);
 
         // 2. La fachada persiste
         guardarCambios();
@@ -143,27 +143,27 @@ public class SistemaGestionReclamos {
     // --- Métodos de Consulta (Simples delegaciones) ---
 
     public Map<String, Usuario> getTodosLosUsuarios() {
-        return servicioUsuarios.getTodosLosUsuarios();
+        return usuarioService.getTodosLosUsuarios();
     }
 
     public List<Reclamo> getTodosLosReclamos() {
-        return servicioReclamos.getTodosLosReclamos();
+        return reclamoService.getTodosLosReclamos();
     }
 
     public List<Reclamo> getReclamosPorVecino(Vecino vecino) {
-        return servicioReclamos.getReclamosPorVecino(vecino);
+        return reclamoService.getReclamosPorVecino(vecino);
     }
 
-    public List<Reclamo> getReclamosPorEmpleado(EmpleadoMunicipal empleado) {
-        return servicioReclamos.getReclamosPorEmpleado(empleado);
+    public List<Reclamo> getReclamosPorEmpleado(Empleado empleado) {
+        return reclamoService.getReclamosPorEmpleado(empleado);
     }
 
     public List<Reclamo> getTodosLosReclamosOrdenadosPorFecha() {
-        return servicioReclamos.getTodosLosReclamosOrdenadosPorFecha();
+        return reclamoService.getTodosLosReclamosOrdenadosPorFecha();
     }
 
-    public Set<SectorEmpleado> getSectoresConReclamosAsignados() {
-        return servicioReclamos.getSectoresConReclamosAsignados();
+    public Set<AreaEmpleado> getAreasConReclamosAsignados() {
+        return reclamoService.getAreasConReclamosAsignados();
     }
 
     // --- Datos de Prueba (Se mantiene en la fachada) ---
@@ -176,13 +176,13 @@ public class SistemaGestionReclamos {
 
             // Creamos los otros usuarios directamente en el mapa (ya que no hay registro
             // para ellos)
-            EmpleadoMunicipal e1 = new EmpleadoMunicipal("empleado", "123", "Franco Brossi", "28123456",
-                    SectorEmpleado.VIALIDAD);
-            Administrador a1 = new Administrador("admin", "123", "Admin General", "25123456");
+            Empleado e1 = new Empleado("empleado", "123", "Franco Brossi", "28123456",
+                    AreaEmpleado.MANTENIMIENTO);
+            Intendente a1 = new Intendente("admin", "123", "Admin General", "25123456");
             e1.validar();
             a1.validar();
-            usuarios.put(e1.getUsername(), e1);
-            usuarios.put(a1.getUsername(), a1);
+            usuarios.put(e1.getNombreUsuario(), e1);
+            usuarios.put(a1.getNombreUsuario(), a1);
 
             // Crear reclamo
             login("vecino", "123");

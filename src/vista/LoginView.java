@@ -1,6 +1,6 @@
 package vista;
 
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,14 +9,14 @@ import java.awt.event.ActionListener;
 
 public class LoginView extends JFrame {
 
-    private SistemaGestionReclamos sistema;
+    private ReclamoController sistema;
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnLogin;
     private JButton btnRegistrarse; // <-- NUEVO BOTÓN
     private JLabel lblError;
 
-    public LoginView(SistemaGestionReclamos sistema) {
+    public LoginView(ReclamoController sistema) {
         this.sistema = sistema;
 
         // --- Configuración de la Ventana (JFrame) ---
@@ -74,10 +74,10 @@ public class LoginView extends JFrame {
     }
 
     private void handleLogin() {
-        String username = txtUsername.getText();
+        String nombreUsuario = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
 
-        if (sistema.login(username, password)) {
+        if (sistema.login(nombreUsuario, password)) {
             // Login exitoso
             this.dispose();
 

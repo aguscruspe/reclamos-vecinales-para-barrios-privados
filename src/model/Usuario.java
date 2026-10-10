@@ -11,23 +11,23 @@ public abstract class Usuario implements IValidable {
 
     private static int contadorId = 0;
     protected int id;
-    protected String username;
+    protected String nombreUsuario;
     protected String password;
     protected String nombreCompleto;
     protected String dni;
 
-    public Usuario(String username, String password, String nombreCompleto, String dni) {
+    public Usuario(String nombreUsuario, String password, String nombreCompleto, String dni) {
         this.id = ++contadorId;
-        this.username = username;
+        this.nombreUsuario = nombreUsuario;
         this.password = password;
         this.nombreCompleto = nombreCompleto;
         this.dni = dni;
     }
 
     // Constructor para carga desde persistencia
-    public Usuario(int id, String username, String password, String nombreCompleto, String dni) {
+    public Usuario(int id, String nombreUsuario, String password, String nombreCompleto, String dni) {
         this.id = id;
-        this.username = username;
+        this.nombreUsuario = nombreUsuario;
         this.password = password;
         this.nombreCompleto = nombreCompleto;
         this.dni = dni;
@@ -39,8 +39,8 @@ public abstract class Usuario implements IValidable {
         return id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
     public String getNombreCompleto() {
@@ -67,6 +67,6 @@ public abstract class Usuario implements IValidable {
     @Override
     public String toString() {
         return String.format("ID: %d, Username: %s, Nombre: %s, Tipo: %s",
-                id, username, nombreCompleto, getTipoUsuario());
+                id, nombreUsuario, nombreCompleto, getTipoUsuario());
     }
 }

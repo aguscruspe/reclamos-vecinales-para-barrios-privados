@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Principio de Inversión de Dependencias (DIP):
  * Define la abstracción de la persistencia.
- * La capa de negocio (SistemaGestionReclamos) dependerá de esta
+ * La capa de negocio (ReclamoController) dependerá de esta
  * interfaz, no de la implementación concreta (GestorPersistencia).
  *
  * SRP: El contrato se centra únicamente en la persistencia.

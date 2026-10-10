@@ -3,14 +3,14 @@ package vista;
 import excepts.PersistenciaException;
 import excepts.UsuarioNoValidoException;
 import model.enums.TipoReclamo;
-import negocio.SistemaGestionReclamos;
+import negocio.ReclamoController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class CrearReclamoView extends JDialog {
 
-    private SistemaGestionReclamos sistema;
+    private ReclamoController sistema;
 
     // Componentes del formulario
     private JComboBox<TipoReclamo> comboBoxTipo;
@@ -18,7 +18,7 @@ public class CrearReclamoView extends JDialog {
     private JTextField txtUbicacion;
     private JButton btnGuardar;
 
-    public CrearReclamoView(JFrame parent, SistemaGestionReclamos sistema) {
+    public CrearReclamoView(JFrame parent, ReclamoController sistema) {
         super(parent, "Crear Nuevo Reclamo", true); // true = MODAL
         this.sistema = sistema;
 

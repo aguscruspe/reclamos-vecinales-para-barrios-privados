@@ -10,11 +10,11 @@ import java.util.Map;
  * SRP: Esta clase tiene la única responsabilidad de gestionar la lógica
  * de negocio relacionada con los Usuarios.
  */
-public class ServicioUsuarios {
+public class UsuarioService {
 
     private Map<String, Usuario> usuarios; // Referencia al mapa principal
 
-    public ServicioUsuarios(Map<String, Usuario> usuarios) {
+    public UsuarioService(Map<String, Usuario> usuarios) {
         this.usuarios = usuarios;
     }
 
@@ -23,8 +23,8 @@ public class ServicioUsuarios {
      * 
      * @return El Usuario si es exitoso, o null si falla.
      */
-    public Usuario autenticar(String username, String password) {
-        Usuario u = usuarios.get(username);
+    public Usuario autenticar(String nombreUsuario, String password) {
+        Usuario u = usuarios.get(nombreUsuario);
         if (u != null && u.autenticar(password)) {
             return u;
         }
@@ -35,20 +35,20 @@ public class ServicioUsuarios {
      * Registra un nuevo vecino en el sistema.
      * Implementa la lógica de validación de duplicados.
      */
-    public Vecino registrarVecino(String username, String password, String nombreCompleto, String dni, String direccion)
+    public Vecino registrarVecino(String nombreUsuario, String password, String nombreCompleto, String dni, String direccion)
             throws UsuarioNoValidoException {
 
         // 1. Validar duplicado
-        if (usuarios.containsKey(username)) {
-            throw new UsuarioNoValidoException("El nombre de usuario '" + username + "' ya existe.");
+        if (usuarios.containsKey(nombreUsuario)) {
+            throw new UsuarioNoValidoException("El nombre de usuario '" + nombreUsuario + "' ya existe.");
         }
 
         // 2. Crear y validar (el modelo valida datos incompletos)
-        Vecino nuevoVecino = new Vecino(username, password, nombreCompleto, dni, direccion);
+        Vecino nuevoVecino = new Vecino(nombreUsuario, password, nombreCompleto, dni, direccion);
         nuevoVecino.validar(); // Arroja UsuarioNoValidoException si faltan datos
 
         // 3. Añadir al mapa en memoria
-        this.usuarios.put(nuevoVecino.getUsername(), nuevoVecino);
+        this.usuarios.put(nuevoVecino.getNombreUsuario(), nuevoVecino);
 
         return nuevoVecino;
     }
@@ -57,7 +57,7 @@ public class ServicioUsuarios {
         return this.usuarios;
     }
 
-    public Usuario getUsuarioPorUsername(String username) {
-        return this.usuarios.get(username);
+    public Usuario getUsuarioPorUsername(String nombreUsuario) {
+        return this.usuarios.get(nombreUsuario);
     }
 }

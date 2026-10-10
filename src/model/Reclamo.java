@@ -26,16 +26,16 @@ public class Reclamo {
     private String ubicacion;
 
     // Relaciones clave
-    private Vecino vecinoReporta;
-    private EmpleadoMunicipal empleadoAsignado; // Puede ser null
+    private Vecino vecino;
+    private Empleado empleadoAsignado; // Puede ser null
     private List<HistorialEstado> historial;
 
-    public Reclamo(TipoReclamo tipo, String descripcion, String ubicacion, Vecino vecinoReporta) {
+    public Reclamo(TipoReclamo tipo, String descripcion, String ubicacion, Vecino vecino) {
         this.id = ++contadorId;
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.ubicacion = ubicacion;
-        this.vecinoReporta = vecinoReporta;
+        this.vecino = vecino;
         this.historial = new ArrayList<>();
 
         // Aplicando GRASP Creator: El reclamo crea su estado inicial.
@@ -43,13 +43,13 @@ public class Reclamo {
     }
 
     // Constructor para carga desde persistencia
-    public Reclamo(int id, TipoReclamo tipo, String descripcion, String ubicacion, Vecino vecinoReporta,
-                   EmpleadoMunicipal empleadoAsignado, List<HistorialEstado> historial) {
+    public Reclamo(int id, TipoReclamo tipo, String descripcion, String ubicacion, Vecino vecino,
+                   Empleado empleadoAsignado, List<HistorialEstado> historial) {
         this.id = id;
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.ubicacion = ubicacion;
-        this.vecinoReporta = vecinoReporta;
+        this.vecino = vecino;
         this.empleadoAsignado = empleadoAsignado;
         this.historial = historial;
         if (id > contadorId)
@@ -73,7 +73,7 @@ public class Reclamo {
         return historial.get(historial.size() - 1).getEstado();
     }
 
-    public void asignarEmpleado(EmpleadoMunicipal empleado, String observacion) {
+    public void asignarEmpleado(Empleado empleado, String observacion) {
         this.empleadoAsignado = empleado;
         agregarHistorial(EstadoReclamo.ASIGNADO, observacion);
     }
@@ -101,11 +101,11 @@ public class Reclamo {
         return ubicacion;
     }
 
-    public Vecino getVecinoReporta() {
-        return vecinoReporta;
+    public Vecino getVecino() {
+        return vecino;
     }
 
-    public EmpleadoMunicipal getEmpleadoAsignado() {
+    public Empleado getEmpleadoAsignado() {
         return empleadoAsignado;
     }
 
@@ -136,7 +136,7 @@ public class Reclamo {
                 getEstadoActual(),
                 tipo,
                 descripcion,
-                vecinoReporta.getNombreCompleto(),
+                vecino.getNombreCompleto(),
                 asignado);
     }
 }

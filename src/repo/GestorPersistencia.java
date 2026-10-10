@@ -35,7 +35,7 @@ public class GestorPersistencia implements IRepositorio {
                 String[] datos = linea.split(DELIMITADOR);
                 int id = Integer.parseInt(datos[0]);
                 String tipoUsuario = datos[1];
-                String username = datos[2];
+                String nombreUsuario = datos[2];
                 String password = datos[3]; // <--- AHORA LEE LA CONTRASEÑA REAL
                 String nombre = datos[4];
                 String dni = datos[5];      // <--- AHORA LEE EL DNI REAL
@@ -43,18 +43,18 @@ public class GestorPersistencia implements IRepositorio {
                 Usuario u = null;
                 switch (tipoUsuario) {
                     case "Vecino":
-                        u = new Vecino(id, username, password, nombre, dni, datos[6]);
+                        u = new Vecino(id, nombreUsuario, password, nombre, dni, datos[6]);
                         break;
-                    case "EmpleadoMunicipal":
-                        u = new EmpleadoMunicipal(id, username, password, nombre, dni,
-                                SectorEmpleado.valueOf(datos[6]));
+                    case "Empleado":
+                        u = new Empleado(id, nombreUsuario, password, nombre, dni,
+                                AreaEmpleado.valueOf(datos[6]));
                         break;
-                    case "Administrador":
-                        u = new Administrador(id, username, password, nombre, dni);
+                    case "Intendente":
+                        u = new Intendente(id, nombreUsuario, password, nombre, dni);
                         break;
                 }
                 if (u != null) {
-                    usuarios.put(u.getUsername(), u);
+                    usuarios.put(u.getNombreUsuario(), u);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -84,13 +84,13 @@ public class GestorPersistencia implements IRepositorio {
                 int idVecino = Integer.parseInt(datos[4]);
                 int idEmpleado = Integer.parseInt(datos[5]); // 0 si es null
 
-                // Buscamos los usuarios por ID (más eficiente que por username)
+                // Buscamos los usuarios por ID (más eficiente que por nombreUsuario)
                 Vecino vecino = (Vecino) usuarios.values().stream()
                         .filter(u -> u.getId() == idVecino && u instanceof Vecino)
                         .findFirst().orElse(null);
 
-                EmpleadoMunicipal empleado = (EmpleadoMunicipal) usuarios.values().stream()
-                        .filter(u -> u.getId() == idEmpleado && u instanceof EmpleadoMunicipal)
+                Empleado empleado = (Empleado) usuarios.values().stream()
+                        .filter(u -> u.getId() == idEmpleado && u instanceof Empleado)
                         .findFirst().orElse(null);
 
                 if (vecino != null) {
@@ -139,15 +139,15 @@ public class GestorPersistencia implements IRepositorio {
                 // **** CAMBIOS APLICADOS (FIX BUGS LOGIN Y DNI) ****
                 String lineaBase = u.getId() + DELIMITADOR +
                         u.getTipoUsuario() + DELIMITADOR +
-                        u.getUsername() + DELIMITADOR +
+                        u.getNombreUsuario() + DELIMITADOR +
                         u.getPassword() + DELIMITADOR + // <--- ARREGLADO
                         u.getNombreCompleto() + DELIMITADOR +
                         u.getDni(); // <--- ARREGLADO
 
                 if (u instanceof Vecino) {
                     lineaBase += DELIMITADOR + ((Vecino) u).getDireccion();
-                } else if (u instanceof EmpleadoMunicipal) {
-                    lineaBase += DELIMITADOR + ((EmpleadoMunicipal) u).getSector().name();
+                } else if (u instanceof Empleado) {
+                    lineaBase += DELIMITADOR + ((Empleado) u).getArea().name();
                 }
 
                 bw.write(lineaBase);
@@ -173,7 +173,7 @@ public class GestorPersistencia implements IRepositorio {
                         r.getTipo().name() + DELIMITADOR +
                         r.getDescripcion() + DELIMITADOR +
                         r.getUbicacion() + DELIMITADOR +
-                        r.getVecinoReporta().getId() + DELIMITADOR +
+                        r.getVecino().getId() + DELIMITADOR +
                         idEmpleado;
                 bwReclamos.write(lineaReclamo);
                 bwReclamos.newLine();
