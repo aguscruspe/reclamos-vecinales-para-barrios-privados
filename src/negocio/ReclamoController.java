@@ -13,8 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * GRASP - Controller (o Facade):
- * Esta clase actúa como la fachada principal del sistema.
+ * GRASP - Controlador:
  * Es el único punto de entrada para la capa de Vista.
  * Delega la lógica de negocio a servicios especializados (SRP).
  */
@@ -88,7 +87,7 @@ public class ReclamoController {
         // 1. Delega la creación y validación al servicio
         Vecino nuevoVecino = usuarioService.registrarVecino(nombreUsuario, password, nombreCompleto, dni, lote);
 
-        // 2. La fachada se encarga de persistir
+        // 2. El controlador se encarga de persistir
         guardarCambios();
 
         System.out.println("Nuevo vecino registrado con ID: " + nuevoVecino.getId());
@@ -117,7 +116,7 @@ public class ReclamoController {
         // 1. Delega la creación al servicio
         Reclamo nuevoReclamo = reclamoService.crearReclamo(tipo, descripcion, ubicacion, vecino);
 
-        // 2. La fachada persiste
+        // 2. El controlador persiste
         guardarCambios();
 
         System.out.println("Nuevo reclamo creado con ID: " + nuevoReclamo.getId());
@@ -134,7 +133,7 @@ public class ReclamoController {
         // 1. Delega la asignación al servicio
         reclamoService.asignarReclamo(idReclamo, usernameEmpleado, usuarioLogueado.getNombreUsuario());
 
-        // 2. La fachada persiste
+        // 2. El controlador persiste
         guardarCambios();
 
         System.out.printf("Reclamo %d asignado a %s.\n", idReclamo, usernameEmpleado);
@@ -149,7 +148,7 @@ public class ReclamoController {
         // 1. Delega la actualización al servicio
         reclamoService.actualizarEstadoReclamo(idReclamo, nuevoEstado, observacion, usuarioLogueado);
 
-        // 2. La fachada persiste
+        // 2. El controlador persiste
         guardarCambios();
 
         System.out.printf("Reclamo %d actualizado a estado %s.\n", idReclamo, nuevoEstado);
@@ -181,7 +180,7 @@ public class ReclamoController {
         return reclamoService.getAreasConReclamosAsignados();
     }
 
-    // --- Datos de Prueba (Se mantiene en la fachada) ---
+    // --- Datos de Prueba (Se mantiene en el controlador) ---
 
     public void crearDatosDePruebaSiNoExisten() throws PersistenciaException, UsuarioNoValidoException {
         if (this.usuarios.isEmpty()) {
@@ -197,7 +196,7 @@ public class ReclamoController {
             // para ellos)
             Empleado e1 = new Empleado("empleado", "123", "Franco Brossi", "28123456",
                     AreaEmpleado.MANTENIMIENTO);
-            Intendente a1 = new Intendente("admin", "123", "Admin General", "25123456");
+            Intendente a1 = new Intendente("intendente", "123", "Intendente General", "25123456");
             e1.validar();
             a1.validar();
             usuarios.put(e1.getNombreUsuario(), e1);
@@ -212,7 +211,7 @@ public class ReclamoController {
             crearReclamo(TipoReclamo.ELECTRICIDAD, "No funciona la luminaria de la esquina", "Calle 5 y Calle 8");
             logout();
 
-            // Guardamos los usuarios (admin/empleado) que no se guardaron con
+            // Guardamos los usuarios (intendente/empleado) que no se guardaron con
             // registrarVecino
             guardarCambios();
             System.out.println("Datos de prueba creados y guardados.");

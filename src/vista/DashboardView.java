@@ -27,7 +27,7 @@ public class DashboardView extends JFrame {
         this.usuarioLogueado = sistema.getUsuarioLogueado();
 
         // --- Configuración de la Ventana ---
-        setTitle("Dashboard - Sistema de Reclamos (" + usuarioLogueado.getNombreUsuario() + ")");
+        setTitle("Reclamos del Barrio - Panel (" + usuarioLogueado.getNombreUsuario() + ")");
         setSize(950, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -105,7 +105,7 @@ public class DashboardView extends JFrame {
             });
         }
 
-        // 2. Conectamos "Actualizar Estado Seleccionado" (Admin/Empleado)
+        // 2. Conectamos "Actualizar Estado Seleccionado" (Intendente/Empleado)
         if (btnActualizarEstado != null) {
             btnActualizarEstado.addActionListener(e -> {
                 int filaSeleccionada = tablaReclamos.getSelectedRow();
@@ -192,7 +192,7 @@ public class DashboardView extends JFrame {
             reclamos = sistema.getReclamosPorEmpleado((model.Empleado) this.usuarioLogueado);
 
         } else {
-            // Si es Admin (u otro tipo), trae TODOS
+            // Si es Intendente (u otro tipo), trae TODOS
             reclamos = sistema.getTodosLosReclamosOrdenadosPorFecha();
         }
 

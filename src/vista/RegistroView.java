@@ -75,7 +75,7 @@ public class RegistroView extends JDialog {
         Lote lote = (Lote) comboBoxLote.getSelectedItem();
 
         try {
-            // Llamamos a la nueva función en la fachada
+            // Llamamos a la nueva función en el controlador
             sistema.registrarVecino(nombreUsuario, password, nombre, dni, lote);
 
             JOptionPane.showMessageDialog(this,

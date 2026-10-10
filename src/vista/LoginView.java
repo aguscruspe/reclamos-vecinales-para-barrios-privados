@@ -20,7 +20,7 @@ public class LoginView extends JFrame {
         this.sistema = sistema;
 
         // --- Configuración de la Ventana (JFrame) ---
-        setTitle("Sistema de Reclamos");
+        setTitle("Reclamos del Barrio Privado");
         setSize(400, 250); // Ligeramente más alto para el nuevo botón
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
