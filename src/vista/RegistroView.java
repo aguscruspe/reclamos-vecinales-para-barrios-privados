@@ -2,6 +2,7 @@ package vista;
 
 import excepts.PersistenciaException;
 import excepts.UsuarioNoValidoException;
+import model.Lote;
 import negocio.ReclamoController;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ public class RegistroView extends JDialog {
     private JPasswordField txtPassword;
     private JTextField txtNombreCompleto;
     private JTextField txtDni;
-    private JTextField txtDireccion;
+    private JComboBox<Lote> comboBoxLote;
     private JButton btnRegistrar;
 
     public RegistroView(Frame parent, ReclamoController sistema) {
@@ -48,9 +49,9 @@ public class RegistroView extends JDialog {
         txtDni = new JTextField();
         panelFormulario.add(txtDni);
 
-        panelFormulario.add(new JLabel("Dirección:"));
-        txtDireccion = new JTextField();
-        panelFormulario.add(txtDireccion);
+        panelFormulario.add(new JLabel("Lote:"));
+        comboBoxLote = new JComboBox<>(sistema.getLotes().toArray(new Lote[0]));
+        panelFormulario.add(comboBoxLote);
 
         add(panelFormulario, BorderLayout.CENTER);
 
@@ -71,11 +72,11 @@ public class RegistroView extends JDialog {
         String password = new String(txtPassword.getPassword());
         String nombre = txtNombreCompleto.getText();
         String dni = txtDni.getText();
-        String direccion = txtDireccion.getText();
+        Lote lote = (Lote) comboBoxLote.getSelectedItem();
 
         try {
             // Llamamos a la nueva función en la fachada
-            sistema.registrarVecino(nombreUsuario, password, nombre, dni, direccion);
+            sistema.registrarVecino(nombreUsuario, password, nombre, dni, lote);
 
             JOptionPane.showMessageDialog(this,
                     "¡Registro exitoso! Ya puede iniciar sesión.",

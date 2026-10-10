@@ -1,6 +1,7 @@
 package repo;
 
 import excepts.PersistenciaException;
+import model.Lote;
 import model.Reclamo;
 import model.Usuario;
 import java.util.List;
@@ -17,7 +18,10 @@ import java.util.Map;
 public interface IRepositorio {
 
     // Métodos para cargar el estado inicial del sistema
-    Map<String, Usuario> cargarUsuarios() throws PersistenciaException;
+    Map<Integer, Lote> cargarLotes() throws PersistenciaException;
+
+    // Recibe los lotes para poder enlazar cada Vecino con su objeto Lote
+    Map<String, Usuario> cargarUsuarios(Map<Integer, Lote> lotes) throws PersistenciaException;
 
     Map<Integer, Reclamo> cargarReclamos(Map<String, Usuario> usuarios) throws PersistenciaException;
 

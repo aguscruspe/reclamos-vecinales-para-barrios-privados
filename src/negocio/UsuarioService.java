@@ -1,6 +1,7 @@
 package negocio;
 
 import excepts.UsuarioNoValidoException;
+import model.Lote;
 import model.Usuario;
 import model.Vecino;
 
@@ -35,7 +36,7 @@ public class UsuarioService {
      * Registra un nuevo vecino en el sistema.
      * Implementa la lógica de validación de duplicados.
      */
-    public Vecino registrarVecino(String nombreUsuario, String password, String nombreCompleto, String dni, String direccion)
+    public Vecino registrarVecino(String nombreUsuario, String password, String nombreCompleto, String dni, Lote lote)
             throws UsuarioNoValidoException {
 
         // 1. Validar duplicado
@@ -44,7 +45,7 @@ public class UsuarioService {
         }
 
         // 2. Crear y validar (el modelo valida datos incompletos)
-        Vecino nuevoVecino = new Vecino(nombreUsuario, password, nombreCompleto, dni, direccion);
+        Vecino nuevoVecino = new Vecino(nombreUsuario, password, nombreCompleto, dni, lote);
         nuevoVecino.validar(); // Arroja UsuarioNoValidoException si faltan datos
 
         // 3. Añadir al mapa en memoria

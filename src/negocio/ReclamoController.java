@@ -6,6 +6,8 @@ import model.enums.*;
 import repo.IRepositorio;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +28,7 @@ public class ReclamoController {
     private ReclamoService reclamoService;
 
     // Estado en memoria
+    private Map<Integer, Lote> lotes; // Acceso rápido por número de lote
     private Map<String, Usuario> usuarios; // Acceso rápido por nombreUsuario
     private Map<Integer, Reclamo> reclamos; // Acceso rápido por ID
 
@@ -39,7 +42,8 @@ public class ReclamoController {
 
     public void iniciarSistema() throws PersistenciaException {
         // Cargar datos del repositorio
-        this.usuarios = repositorio.cargarUsuarios();
+        this.lotes = repositorio.cargarLotes();
+        this.usuarios = repositorio.cargarUsuarios(this.lotes);
         this.reclamos = repositorio.cargarReclamos(this.usuarios);
 
         // Inyectar los mapas en los servicios
@@ -47,7 +51,7 @@ public class ReclamoController {
         this.reclamoService = new ReclamoService(this.reclamos, this.usuarios);
 
         System.out.println(
-                "Sistema iniciado. " + usuarios.size() + " usuarios y " + reclamos.size() + " reclamos cargados.");
+                "Sistema iniciado. " + lotes.size() + " lotes, " + usuarios.size() + " usuarios y " + reclamos.size() + " reclamos cargados.");
     }
 
     private void guardarCambios() throws PersistenciaException {
@@ -78,17 +82,27 @@ public class ReclamoController {
     }
 
     // --- (NUEVO) Lógica de Registro (Corrección #2) ---
-    public Vecino registrarVecino(String nombreUsuario, String password, String nombreCompleto, String dni, String direccion)
+    public Vecino registrarVecino(String nombreUsuario, String password, String nombreCompleto, String dni, Lote lote)
             throws UsuarioNoValidoException, PersistenciaException {
 
         // 1. Delega la creación y validación al servicio
-        Vecino nuevoVecino = usuarioService.registrarVecino(nombreUsuario, password, nombreCompleto, dni, direccion);
+        Vecino nuevoVecino = usuarioService.registrarVecino(nombreUsuario, password, nombreCompleto, dni, lote);
 
         // 2. La fachada se encarga de persistir
         guardarCambios();
 
         System.out.println("Nuevo vecino registrado con ID: " + nuevoVecino.getId());
         return nuevoVecino;
+    }
+
+    /**
+     * Lotes del barrio, ordenados por número.
+     * Los lotes vienen precargados en data/lotes.csv (no hay alta de lotes desde el sistema).
+     */
+    public List<Lote> getLotes() {
+        return lotes.values().stream()
+                .sorted(Comparator.comparingInt(Lote::getNumero))
+                .collect(Collectors.toList());
     }
 
     // --- Lógica de Negocio (Reclamos) ---
@@ -172,7 +186,11 @@ public class ReclamoController {
         if (this.usuarios.isEmpty()) {
             System.out.println("Creando datos de prueba...");
             // Crear usuarios (usando el método de registro)
-            registrarVecino("vecino", "123", "Lautaro Vita", "30123456", "Calle Falsa 123");
+            if (this.lotes.isEmpty()) {
+                System.out.println("No hay lotes cargados (data/lotes.csv): no se crean datos de prueba.");
+                return;
+            }
+            registrarVecino("vecino", "123", "Lautaro Vita", "30123456", getLotes().get(0));
 
             // Creamos los otros usuarios directamente en el mapa (ya que no hay registro
             // para ellos)

@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public class GestorPersistencia implements IRepositorio {
 
+    private static final String LOTES_FILE = "data/lotes.csv";
     private static final String USUARIOS_FILE = "data/usuarios.csv";
     private static final String RECLAMOS_FILE = "data/reclamos.csv";
     private static final String HISTORIAL_FILE = "data/historial.csv";
@@ -27,7 +28,29 @@ public class GestorPersistencia implements IRepositorio {
     }
 
     @Override
-    public Map<String, Usuario> cargarUsuarios() throws PersistenciaException {
+    public Map<Integer, Lote> cargarLotes() throws PersistenciaException {
+        // Formato de cada línea: numero;sector
+        Map<Integer, Lote> lotes = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(LOTES_FILE))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) {
+                    continue;
+                }
+                String[] datos = linea.split(DELIMITADOR);
+                Lote lote = new Lote(Integer.parseInt(datos[0]), datos[1]);
+                lotes.put(lote.getNumero(), lote);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Archivo de lotes no encontrado.");
+        } catch (IOException | ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
+            throw new PersistenciaException("Error al leer el archivo de lotes.", e);
+        }
+        return lotes;
+    }
+
+    @Override
+    public Map<String, Usuario> cargarUsuarios(Map<Integer, Lote> lotes) throws PersistenciaException {
         Map<String, Usuario> usuarios = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(USUARIOS_FILE))) {
             String linea;
@@ -43,7 +66,9 @@ public class GestorPersistencia implements IRepositorio {
                 Usuario u = null;
                 switch (tipoUsuario) {
                     case "Vecino":
-                        u = new Vecino(id, nombreUsuario, password, nombre, dni, datos[6]);
+                        // La columna 6 tiene el número de lote: lo traducimos al objeto Lote
+                        Lote lote = lotes.get(Integer.parseInt(datos[6]));
+                        u = new Vecino(id, nombreUsuario, password, nombre, dni, lote);
                         break;
                     case "Empleado":
                         u = new Empleado(id, nombreUsuario, password, nombre, dni,
@@ -145,7 +170,7 @@ public class GestorPersistencia implements IRepositorio {
                         u.getDni(); // <--- ARREGLADO
 
                 if (u instanceof Vecino) {
-                    lineaBase += DELIMITADOR + ((Vecino) u).getDireccion();
+                    lineaBase += DELIMITADOR + ((Vecino) u).getLote().getNumero();
                 } else if (u instanceof Empleado) {
                     lineaBase += DELIMITADOR + ((Empleado) u).getArea().name();
                 }
