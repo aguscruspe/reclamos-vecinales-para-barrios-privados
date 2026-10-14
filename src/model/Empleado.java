@@ -1,7 +1,6 @@
 package model;
 
 import model.enums.AreaEmpleado;
-import excepts.UsuarioNoValidoException;
 
 public class Empleado extends Usuario {
 
@@ -27,15 +26,5 @@ public class Empleado extends Usuario {
     @Override
     public String getTipoUsuario() {
         return "Empleado";
-    }
-
-    @Override
-    public void validar() throws UsuarioNoValidoException {
-        if (nombreUsuario == null || nombreUsuario.trim().isEmpty() ||
-                password == null || password.trim().isEmpty() ||
-                dni == null || dni.trim().isEmpty() ||
-                area == null) {
-            throw new UsuarioNoValidoException("Datos incompletos para el empleado.");
-        }
     }
 }

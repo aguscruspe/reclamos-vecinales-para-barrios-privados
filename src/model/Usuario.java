@@ -1,6 +1,7 @@
 package model;
 
 import model.interfaces.IValidable;
+import excepts.UsuarioNoValidoException;
 
 /**
  * Clase abstracta base para todos los tipos de usuarios.
@@ -68,5 +69,16 @@ public abstract class Usuario implements IValidable {
     public String toString() {
         return String.format("ID: %d, Username: %s, Nombre: %s, Tipo: %s",
                 id, nombreUsuario, nombreCompleto, getTipoUsuario());
+    }
+
+    //Implementación de la interfaz IValidable, primer code smell identificado
+     @Override
+    public void validar() throws UsuarioNoValidoException {
+        if (nombreUsuario == null || nombreUsuario.trim().isEmpty() ||
+                password == null || password.trim().isEmpty() ||
+                dni == null || dni.trim().isEmpty() ||
+                nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
+            throw new UsuarioNoValidoException("Datos incompletos para el empleado.");
+        }
     }
 }
