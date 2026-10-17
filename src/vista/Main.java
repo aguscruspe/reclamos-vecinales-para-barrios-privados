@@ -10,12 +10,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // 1. Inyección de Dependencias (Igual que antes)
         IRepositorio repositorio = new GestorPersistencia();
         ReclamoController sistema = new ReclamoController(repositorio);
 
         try {
-            // 2. Carga inicial del sistema (Igual que antes)
             sistema.iniciarSistema();
             sistema.crearDatosDePruebaSiNoExisten();
 
@@ -27,13 +25,9 @@ public class Main {
             return;
         }
 
-        // 3. Iniciar la Interfaz Gráfica (GUI)
-        // SwingUtilities.invokeLater asegura que la GUI se cree y muestre
-        // en el hilo correcto (Event Dispatch Thread).
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // Creamos la vista de Login y le pasamos el sistema (controlador)
                 LoginView login = new LoginView(sistema);
                 login.setVisible(true);
             }

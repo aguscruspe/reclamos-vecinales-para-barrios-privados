@@ -15,7 +15,6 @@ public class HistorialEstado {
         this.observacion = observacion;
     }
 
-    // Constructor para carga desde persistencia
     public HistorialEstado(LocalDateTime fecha, EstadoReclamo estado, String observacion) {
         this.fecha = fecha;
         this.estado = estado;

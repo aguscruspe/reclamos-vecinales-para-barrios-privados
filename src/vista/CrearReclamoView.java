@@ -12,22 +12,19 @@ public class CrearReclamoView extends JDialog {
 
     private ReclamoController sistema;
 
-    // Componentes del formulario
     private JComboBox<TipoReclamo> comboBoxTipo;
     private JTextField txtDescripcion;
     private JTextField txtUbicacion;
     private JButton btnGuardar;
 
     public CrearReclamoView(JFrame parent, ReclamoController sistema) {
-        super(parent, "Crear Nuevo Reclamo", true); // true = MODAL
+        super(parent, "Crear Nuevo Reclamo", true);
         this.sistema = sistema;
 
-        // --- Configuración de la Ventana (JDialog) ---
         setSize(450, 200);
-        setLocationRelativeTo(parent); // Se centra sobre el Dashboard
+        setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
-        // --- Panel de Formulario (Centro) ---
         JPanel panelFormulario = new JPanel(new GridLayout(3, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -46,13 +43,11 @@ public class CrearReclamoView extends JDialog {
 
         add(panelFormulario, BorderLayout.CENTER);
 
-        // --- Panel de Botón (Sur) ---
         JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnGuardar = new JButton("Guardar Reclamo");
         panelBoton.add(btnGuardar);
         add(panelBoton, BorderLayout.SOUTH);
 
-        // --- Acción del Botón Guardar ---
         btnGuardar.addActionListener(e -> {
             handleGuardarReclamo();
         });

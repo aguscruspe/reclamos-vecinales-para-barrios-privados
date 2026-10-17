@@ -1,4 +1,3 @@
-// Archivo: Intendente.java
 package model;
 
 

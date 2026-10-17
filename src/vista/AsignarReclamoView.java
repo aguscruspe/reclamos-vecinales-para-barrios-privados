@@ -6,7 +6,6 @@ import excepts.ReclamoNoEncontradoException;
 import excepts.UsuarioNoValidoException;
 import model.Empleado;
 import model.Reclamo;
-import model.Usuario;
 import negocio.ReclamoController;
 
 import javax.swing.*;
@@ -17,8 +16,7 @@ public class AsignarReclamoView extends JDialog {
     private ReclamoController sistema;
     private Reclamo reclamoAAsignar;
 
-    // Componentes del formulario
-    private JComboBox<String> comboBoxEmpleado;
+    private JComboBox<Empleado> comboBoxEmpleado;
     private JButton btnAsignar;
 
     public AsignarReclamoView(JFrame parent, ReclamoController sistema, Reclamo reclamo) {
@@ -27,70 +25,65 @@ public class AsignarReclamoView extends JDialog {
         this.sistema = sistema;
         this.reclamoAAsignar = reclamo;
 
-        // --- Configuración de la Ventana (JDialog) ---
         setSize(400, 150);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
-        // --- Panel de Formulario (Centro) ---
         JPanel panelFormulario = new JPanel(new GridLayout(1, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // 1. Obtenemos solo los empleados del área que corresponde al tipo de reclamo
-        String[] nombresCompletosEmpleados = sistema.getTodosLosUsuarios().values().stream()
+        Empleado[] empleadosDelArea = sistema.getTodosLosUsuarios().values().stream()
                 .filter(u -> u instanceof Empleado)
-                .filter(u -> ((Empleado) u).getArea() == reclamo.getTipo().getArea())
-                .map(Usuario::getNombreCompleto)
-                .toArray(String[]::new);
+                .map(u -> (Empleado) u)
+                .filter(empleado -> empleado.getArea() == reclamo.getTipo().getArea())
+                .toArray(Empleado[]::new);
 
         panelFormulario.add(new JLabel("Empleado (" + reclamo.getTipo().getArea() + "):"));
 
-        // Creamos el ComboBox con los nombres
-        comboBoxEmpleado = new JComboBox<>(nombresCompletosEmpleados);
+        comboBoxEmpleado = new JComboBox<>(empleadosDelArea);
+        comboBoxEmpleado.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                Empleado empleado = (Empleado) value;
+                if (empleado != null) {
+                    setText(empleado.getNombreCompleto() + " (" + empleado.getNombreUsuario() + ")");
+                }
+                return this;
+            }
+        });
 
-        // 2. Si ya está asignado, seleccionamos el nombre completo del empleado actual
         if (reclamo.getEmpleadoAsignado() != null) {
-            comboBoxEmpleado.setSelectedItem(reclamo.getEmpleadoAsignado().getNombreCompleto());
+            comboBoxEmpleado.setSelectedItem(reclamo.getEmpleadoAsignado());
         }
 
         panelFormulario.add(comboBoxEmpleado);
         add(panelFormulario, BorderLayout.CENTER);
 
-        // --- Panel de Botón (Sur) ---
         JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnAsignar = new JButton("Confirmar Asignación");
         panelBoton.add(btnAsignar);
         add(panelBoton, BorderLayout.SOUTH);
 
-        // --- Acción del Botón Asignar ---
         btnAsignar.addActionListener(e -> {
             handleAsignarReclamo();
         });
     }
 
     private void handleAsignarReclamo() {
-        String nombreCompletoEmpleadoSeleccionado = (String) comboBoxEmpleado.getSelectedItem();
+        Empleado empleadoSeleccionado = (Empleado) comboBoxEmpleado.getSelectedItem();
 
-        if (nombreCompletoEmpleadoSeleccionado == null) {
+        if (empleadoSeleccionado == null) {
             JOptionPane.showMessageDialog(this, "Debe seleccionar un empleado.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
-            // 1. Buscamos el USERNAME asociado al nombre completo (para llamar al Backend)
-            String usernameEmpleado = sistema.getTodosLosUsuarios().values().stream()
-                    .filter(u -> u instanceof Empleado)
-                    .filter(u -> u.getNombreCompleto().equals(nombreCompletoEmpleadoSeleccionado))
-                    .map(Usuario::getNombreUsuario)
-                    .findFirst()
-                    .orElseThrow(() -> new UsuarioNoValidoException(
-                            "Error interno: No se pudo encontrar el nombreUsuario del empleado."));
-
-            // 2. Llama a la lógica de negocio (Backend) con el USERNAME
-            sistema.asignarReclamo(reclamoAAsignar.getId(), usernameEmpleado);
+            sistema.asignarReclamo(reclamoAAsignar.getId(), empleadoSeleccionado.getNombreUsuario());
 
             JOptionPane.showMessageDialog(this,
-                    "Reclamo asignado a " + nombreCompletoEmpleadoSeleccionado + " con éxito.",
+                    "Reclamo asignado a " + empleadoSeleccionado.getNombreCompleto() + " con éxito.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
             this.dispose();

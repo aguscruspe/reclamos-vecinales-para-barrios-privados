@@ -1,4 +1,3 @@
-// Archivo: EstadoReclamo.java
 package model.enums;
 
 public enum EstadoReclamo {

@@ -12,7 +12,6 @@ public class RegistroView extends JDialog {
 
     private ReclamoController sistema;
 
-    // Componentes del formulario
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JTextField txtNombreCompleto;
@@ -21,15 +20,13 @@ public class RegistroView extends JDialog {
     private JButton btnRegistrar;
 
     public RegistroView(Frame parent, ReclamoController sistema) {
-        super(parent, "Registro de Nuevo Vecino", true); // true = MODAL
+        super(parent, "Registro de Nuevo Vecino", true); 
         this.sistema = sistema;
 
-        // --- Configuración de la Ventana (JDialog) ---
         setSize(450, 300);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
-        // --- Panel de Formulario (Centro) ---
         JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -55,13 +52,11 @@ public class RegistroView extends JDialog {
 
         add(panelFormulario, BorderLayout.CENTER);
 
-        // --- Panel de Botón (Sur) ---
         JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnRegistrar = new JButton("Confirmar Registro");
         panelBoton.add(btnRegistrar);
         add(panelBoton, BorderLayout.SOUTH);
 
-        // --- Acción del Botón Guardar ---
         btnRegistrar.addActionListener(e -> {
             handleRegistrarVecino();
         });
@@ -75,22 +70,19 @@ public class RegistroView extends JDialog {
         Lote lote = (Lote) comboBoxLote.getSelectedItem();
 
         try {
-            // Llamamos a la nueva función en el controlador
             sistema.registrarVecino(nombreUsuario, password, nombre, dni, lote);
 
             JOptionPane.showMessageDialog(this,
                     "¡Registro exitoso! Ya puede iniciar sesión.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
-            this.dispose(); // Cierra la ventana de registro
+            this.dispose();
 
         } catch (UsuarioNoValidoException ex) {
-            // Captura errores de validación (datos incompletos, nombreUsuario duplicado)
             JOptionPane.showMessageDialog(this,
                     "Error de Validación: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         } catch (PersistenciaException ex) {
-            // Captura errores de guardado
             JOptionPane.showMessageDialog(this,
                     "Error al guardar el usuario: " + ex.getMessage(),
                     "Error del Sistema", JOptionPane.ERROR_MESSAGE);

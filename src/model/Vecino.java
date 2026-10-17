@@ -9,7 +9,6 @@ public class Vecino extends Usuario {
         this.lote = lote;
     }
 
-    // Constructor para carga desde persistencia
     public Vecino(int id, String nombreUsuario, String password, String nombreCompleto, String dni, Lote lote) {
         super(id, nombreUsuario, password, nombreCompleto, dni);
         this.lote = lote;

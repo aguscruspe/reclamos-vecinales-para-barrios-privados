@@ -3,11 +3,6 @@ package model;
 import model.interfaces.IValidable;
 import excepts.UsuarioNoValidoException;
 
-/**
- * Clase abstracta base para todos los tipos de usuarios.
- * Aplica Principio de Sustitución de Liskov (LSP):
- * Cualquier Vecino, Empleado o Admin puede ser tratado como un Usuario.
- */
 public abstract class Usuario implements IValidable {
 
     private static int contadorId = 0;
@@ -25,7 +20,6 @@ public abstract class Usuario implements IValidable {
         this.dni = dni;
     }
 
-    // Constructor para carga desde persistencia
     public Usuario(int id, String nombreUsuario, String password, String nombreCompleto, String dni) {
         this.id = id;
         this.nombreUsuario = nombreUsuario;
@@ -33,7 +27,7 @@ public abstract class Usuario implements IValidable {
         this.nombreCompleto = nombreCompleto;
         this.dni = dni;
         if (id > contadorId)
-            contadorId = id; // Actualizar contador estático
+            contadorId = id;
     }
 
     public int getId() {
@@ -48,12 +42,10 @@ public abstract class Usuario implements IValidable {
         return nombreCompleto;
     }
 
-    // **** AÑADIDO (FIX BUG LOGIN) ****
     public String getPassword() {
         return this.password;
     }
 
-    // **** AÑADIDO (FIX BUG DNI) ****
     public String getDni() {
         return dni;
     }
@@ -62,7 +54,6 @@ public abstract class Usuario implements IValidable {
         return this.password.equals(password);
     }
 
-    // Método abstracto (polimorfismo) que las subclases deben implementar.
     public abstract String getTipoUsuario();
 
     @Override
@@ -71,7 +62,6 @@ public abstract class Usuario implements IValidable {
                 id, nombreUsuario, nombreCompleto, getTipoUsuario());
     }
 
-    //Implementación de la interfaz IValidable, primer code smell identificado
      @Override
     public void validar() throws UsuarioNoValidoException {
         if (nombreUsuario == null || nombreUsuario.trim().isEmpty() ||

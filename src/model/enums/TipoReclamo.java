@@ -1,10 +1,5 @@
 package model.enums;
 
-/**
- * Tipos de reclamo de un barrio privado.
- * GRASP - Experto en Información: cada tipo sabe a qué área le corresponde,
- * así que agregar un tipo nuevo se hace en un solo lugar.
- */
 public enum TipoReclamo {
     ACCESO_NO_AUTORIZADO(AreaEmpleado.SEGURIDAD),
     VELOCIDAD_EXCESIVA(AreaEmpleado.SEGURIDAD),

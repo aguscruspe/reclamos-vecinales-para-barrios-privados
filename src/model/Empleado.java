@@ -12,7 +12,6 @@ public class Empleado extends Usuario {
         this.area = area;
     }
 
-    // Constructor para carga desde persistencia
     public Empleado(int id, String nombreUsuario, String password, String nombreCompleto, String dni,
             AreaEmpleado area) {
         super(id, nombreUsuario, password, nombreCompleto, dni);

@@ -28,7 +28,7 @@ public class Reclamo {
 
     // Relaciones clave
     private Vecino vecino;
-    private Empleado empleadoAsignado; // Puede ser null
+    private Empleado empleadoAsignado;
     private List<HistorialEstado> historial;
 
     public Reclamo(TipoReclamo tipo, String descripcion, String ubicacion, Vecino vecino) {
@@ -39,11 +39,9 @@ public class Reclamo {
         this.vecino = vecino;
         this.historial = new ArrayList<>();
 
-        // Aplicando GRASP Creator: El reclamo crea su estado inicial.
         this.agregarHistorial(EstadoReclamo.NUEVO, "Reclamo generado por el vecino.");
     }
 
-    // Constructor para carga desde persistencia
     public Reclamo(int id, TipoReclamo tipo, String descripcion, String ubicacion, Vecino vecino,
                    Empleado empleadoAsignado, List<HistorialEstado> historial) {
         this.id = id;
@@ -54,19 +52,14 @@ public class Reclamo {
         this.empleadoAsignado = empleadoAsignado;
         this.historial = historial;
         if (id > contadorId)
-            contadorId = id; // Actualizar contador estático
+            contadorId = id;
     }
 
-    // Método privado para mantener la cohesión
     private void agregarHistorial(EstadoReclamo estado, String observacion) {
         HistorialEstado nuevoEstado = new HistorialEstado(estado, observacion);
         this.historial.add(nuevoEstado);
     }
 
-    /**
-     * GRASP - Information Expert:
-     * El reclamo es el experto en saber cuál es su estado actual.
-     */
     public EstadoReclamo getEstadoActual() {
         if (historial.isEmpty()) {
             return null; // No debería pasar
@@ -74,10 +67,6 @@ public class Reclamo {
         return historial.get(historial.size() - 1).getEstado();
     }
 
-    /**
-     * Regla del barrio: un reclamo solo se puede asignar a un empleado
-     * del área que corresponde a su tipo (ej.: PODA -> JARDINERIA).
-     */
     public void asignarEmpleado(Empleado empleado, String observacion) throws AsignacionInvalidaException {
         if (empleado.getArea() != tipo.getArea()) {
             throw new AsignacionInvalidaException("Un reclamo de tipo " + tipo + " corresponde al área "
@@ -93,6 +82,10 @@ public class Reclamo {
         }
     }
 
+    public boolean estaAsignadoA(Usuario usuario) {
+        return empleadoAsignado != null && empleadoAsignado.getId() == usuario.getId();
+    }
+    
     // Getters
     public int getId() {
         return id;
@@ -119,19 +112,11 @@ public class Reclamo {
     }
 
     public List<HistorialEstado> getHistorial() {
-        return new ArrayList<>(historial); // Devuelve copia
+        return new ArrayList<>(historial);
     }
 
-    // --- INICIO DE LA CORRECCIÓN ---
-    // Este es el método que faltaba y causaba el error
-    /**
-     * Devuelve la fecha de creación del reclamo, que es la fecha
-     * del primer estado en el historial.
-     * @return LocalDateTime la fecha de creación, o null si el historial está vacío.
-     */
     public java.time.LocalDateTime getFechaCreacion() {
         if (historial != null && !historial.isEmpty()) {
-            // El primer estado (índice 0) es el de creación
             return historial.get(0).getFecha();
         }
         return null;

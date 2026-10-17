@@ -1,45 +1,56 @@
 package vista;
 
-import excepts.ReclamoNoEncontradoException;
+import model.Empleado;
+import model.Intendente;
 import model.Reclamo;
 import model.Usuario;
+import model.Vecino;
 import negocio.ReclamoController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class DashboardView extends JFrame {
+
+    private static final int COLUMNA_REPORTADO_POR = 4;
 
     private ReclamoController sistema;
     private Usuario usuarioLogueado;
 
-    // Componentes de la GUI
     private JTable tablaReclamos;
     private DefaultTableModel tableModel;
-    private JButton btnNuevoReclamo;
-    private JButton btnAsignar;
-    private JButton btnActualizarEstado;
 
     public DashboardView(ReclamoController sistema) {
         this.sistema = sistema;
         this.usuarioLogueado = sistema.getUsuarioLogueado();
 
-        // --- Configuración de la Ventana ---
+        configurarVentana();
+        add(crearTitulo(), BorderLayout.NORTH);
+        add(crearTabla(), BorderLayout.CENTER);
+        add(crearPanelBotones(), BorderLayout.SOUTH);
+        cargarReclamosEnTabla();
+    }
+
+    private void configurarVentana() {
         setTitle("Reclamos del Barrio - Panel (" + usuarioLogueado.getNombreUsuario() + ")");
         setSize(950, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
+    }
 
-        // --- Panel de Título (Norte) ---
+    private JLabel crearTitulo() {
         JLabel lblTitulo = new JLabel("Bienvenido, " + usuarioLogueado.getNombreCompleto(), SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 20));
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(lblTitulo, BorderLayout.NORTH);
+        return lblTitulo;
+    }
 
-        // --- Panel de Tabla (Centro) ---
+    private JScrollPane crearTabla() {
         String[] columnas = { "ID", "Fecha Creación", "Tipo", "Estado", "Reportado por", "Asignado a", "Ubicación" };
 
         tableModel = new DefaultTableModel(columnas, 0) {
@@ -60,162 +71,101 @@ public class DashboardView extends JFrame {
         tablaReclamos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tablaReclamos.setAutoCreateRowSorter(true);
 
-        if (usuarioLogueado instanceof model.Vecino) {
-            // El índice 4 es "Reportado por"
-            javax.swing.table.TableColumn col = tablaReclamos.getColumnModel().getColumn(4);
-            col.setMinWidth(0);
-            col.setMaxWidth(0);
-            col.setPreferredWidth(0);
+        if (usuarioLogueado instanceof Vecino) {
+            TableColumn columnaReportadoPor = tablaReclamos.getColumnModel().getColumn(COLUMNA_REPORTADO_POR);
+            columnaReportadoPor.setMinWidth(0);
+            columnaReportadoPor.setMaxWidth(0);
+            columnaReportadoPor.setPreferredWidth(0);
         }
-
-        cargarReclamosEnTabla(); // Ahora carga los datos filtrados
 
         JScrollPane scrollPane = new JScrollPane(tablaReclamos);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        add(scrollPane, BorderLayout.CENTER);
+        return scrollPane;
+    }
 
-        // --- Panel de Botones (Sur) ---
+    private JPanel crearPanelBotones() {
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        btnNuevoReclamo = new JButton("Crear Nuevo Reclamo");
-        btnAsignar = new JButton("Asignar Reclamo Seleccionado");
-        btnActualizarEstado = new JButton("Actualizar Estado Seleccionado");
 
-        // Lógica de visibilidad de botones
-        if (usuarioLogueado instanceof model.Vecino) {
+        JButton btnNuevoReclamo = new JButton("Crear Nuevo Reclamo");
+        JButton btnAsignar = new JButton("Asignar Reclamo Seleccionado");
+        JButton btnActualizarEstado = new JButton("Actualizar Estado Seleccionado");
+
+        btnNuevoReclamo.addActionListener(e -> abrirCrearReclamo());
+        btnAsignar.addActionListener(e -> abrirAsignar());
+        btnActualizarEstado.addActionListener(e -> abrirActualizarEstado());
+
+        if (usuarioLogueado instanceof Vecino) {
             panelBotones.add(btnNuevoReclamo);
-        } else if (usuarioLogueado instanceof model.Intendente) {
+        } else if (usuarioLogueado instanceof Intendente) {
             panelBotones.add(btnAsignar);
             panelBotones.add(btnActualizarEstado);
-        } else if (usuarioLogueado instanceof model.Empleado) {
+        } else if (usuarioLogueado instanceof Empleado) {
             panelBotones.add(btnActualizarEstado);
         }
+        return panelBotones;
+    }
 
-        add(panelBotones, BorderLayout.SOUTH);
+    private void abrirCrearReclamo() {
+        new CrearReclamoView(this, sistema).setVisible(true);
+        cargarReclamosEnTabla();
+    }
 
-        // =======================================================
-        // --- CONEXIÓN DE BOTONES (Sin cambios) ---
-        // =======================================================
+    private void abrirAsignar() {
+        Reclamo reclamo = obtenerReclamoSeleccionado();
+        if (reclamo == null) return;
+        new AsignarReclamoView(this, sistema, reclamo).setVisible(true);
+        cargarReclamosEnTabla();
+    }
 
-        // 1. Conectamos "Crear Nuevo Reclamo" (Vecino)
-        if (btnNuevoReclamo != null) {
-            btnNuevoReclamo.addActionListener(e -> {
-                CrearReclamoView form = new CrearReclamoView(this, sistema);
-                form.setVisible(true);
-                cargarReclamosEnTabla();
-            });
+    private void abrirActualizarEstado() {
+        Reclamo reclamo = obtenerReclamoSeleccionado();
+        if (reclamo == null) return;
+        new ActualizarEstadoView(this, sistema, reclamo).setVisible(true);
+        cargarReclamosEnTabla();
+    }
+
+    private Reclamo obtenerReclamoSeleccionado() {
+        int fila = tablaReclamos.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un reclamo de la tabla.",
+                    "Error", JOptionPane.WARNING_MESSAGE);
+            return null;
         }
-
-        // 2. Conectamos "Actualizar Estado Seleccionado" (Intendente/Empleado)
-        if (btnActualizarEstado != null) {
-            btnActualizarEstado.addActionListener(e -> {
-                int filaSeleccionada = tablaReclamos.getSelectedRow();
-                // Importante: convertir índice de vista a modelo (si la tabla se ordena)
-                int filaModelo = tablaReclamos.convertRowIndexToModel(filaSeleccionada);
-
-                if (filaSeleccionada == -1) {
-                    JOptionPane.showMessageDialog(this,
-                            "Por favor, seleccione un reclamo de la tabla.",
-                            "Error", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                int idReclamo = (int) tableModel.getValueAt(filaModelo, 0);
-
-                try {
-                    Reclamo reclamo = sistema.getTodosLosReclamos().stream()
-                            .filter(r -> r.getId() == idReclamo)
-                            .findFirst()
-                            .orElseThrow(
-                                    () -> new ReclamoNoEncontradoException("No se encontró el reclamo en memoria."));
-
-                    ActualizarEstadoView form = new ActualizarEstadoView(this, sistema, reclamo);
-                    form.setVisible(true);
-
-                    cargarReclamosEnTabla();
-
-                } catch (ReclamoNoEncontradoException ex) {
-                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        }
-
-        // 3. Conectamos "Asignar Reclamo Seleccionado" (Intendente)
-        if (btnAsignar != null) {
-            btnAsignar.addActionListener(e -> {
-
-                int filaSeleccionada = tablaReclamos.getSelectedRow();
-                int filaModelo = tablaReclamos.convertRowIndexToModel(filaSeleccionada);
-
-                if (filaSeleccionada == -1) {
-                    JOptionPane.showMessageDialog(this,
-                            "Por favor, seleccione un reclamo de la tabla para asignar.",
-                            "Error", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-
-                int idReclamo = (int) tableModel.getValueAt(filaModelo, 0);
-
-                try {
-                    Reclamo reclamo = sistema.getTodosLosReclamos().stream()
-                            .filter(r -> r.getId() == idReclamo)
-                            .findFirst()
-                            .orElseThrow(
-                                    () -> new ReclamoNoEncontradoException("No se encontró el reclamo en memoria."));
-
-                    AsignarReclamoView form = new AsignarReclamoView(this, sistema, reclamo);
-                    form.setVisible(true);
-
-                    cargarReclamosEnTabla();
-
-                } catch (ReclamoNoEncontradoException ex) {
-                    JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        }
+        int idReclamo = (int) tableModel.getValueAt(tablaReclamos.convertRowIndexToModel(fila), 0);
+        return sistema.getTodosLosReclamos().stream()
+                .filter(r -> r.getId() == idReclamo)
+                .findFirst()
+                .orElse(null);
     }
 
     private void cargarReclamosEnTabla() {
         tableModel.setRowCount(0);
 
-        java.util.List<Reclamo> reclamos; // Declarar lista
-
-        // Carga de datos según el ROL del usuario logueado
-        if (this.usuarioLogueado instanceof model.Vecino) {
-            // Si es Vecino, trae solo SUS reclamos
-            reclamos = sistema.getReclamosPorVecino((model.Vecino) this.usuarioLogueado);
-
-        } else if (this.usuarioLogueado instanceof model.Empleado) {
-            // Si es Empleado, trae solo los ASIGNADOS A ÉL
-            // (Una mejora lógica adicional, la profesora lo apreciará)
-            reclamos = sistema.getReclamosPorEmpleado((model.Empleado) this.usuarioLogueado);
-
+        List<Reclamo> reclamos;
+        if (usuarioLogueado instanceof Vecino) {
+            reclamos = sistema.getReclamosPorVecino((Vecino) usuarioLogueado);
+        } else if (usuarioLogueado instanceof Empleado) {
+            reclamos = sistema.getReclamosPorEmpleado((Empleado) usuarioLogueado);
         } else {
-            // Si es Intendente (u otro tipo), trae TODOS
             reclamos = sistema.getTodosLosReclamosOrdenadosPorFecha();
         }
 
-        // El resto del método es igual
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-        for (Reclamo r : reclamos) {
-            String empleadoAsignado = (r.getEmpleadoAsignado() != null)
-                    ? r.getEmpleadoAsignado().getNombreCompleto()
+        for (Reclamo reclamo : reclamos) {
+            String empleadoAsignado = (reclamo.getEmpleadoAsignado() != null)
+                    ? reclamo.getEmpleadoAsignado().getNombreCompleto()
                     : "N/A";
 
-            String vecino = r.getVecino().getNombreCompleto();
-
             Object[] fila = {
-                    r.getId(),
-                    r.getFechaCreacion().format(formatter),
-                    r.getTipo(),
-                    r.getEstadoActual(),
-                    vecino,
+                    reclamo.getId(),
+                    reclamo.getFechaCreacion().format(formatter),
+                    reclamo.getTipo(),
+                    reclamo.getEstadoActual(),
+                    reclamo.getVecino().getNombreCompleto(),
                     empleadoAsignado,
-                    r.getUbicacion()
+                    reclamo.getUbicacion()
             };
-
             tableModel.addRow(fila);
         }
     }
