@@ -1,5 +1,6 @@
 package model;
 
+import excepts.UsuarioNoValidoException;
 import model.enums.AreaEmpleado;
 
 public class Empleado extends Usuario {
@@ -20,6 +21,14 @@ public class Empleado extends Usuario {
 
     public AreaEmpleado getArea() {
         return area;
+    }
+
+    @Override
+    public void validar() throws UsuarioNoValidoException {
+        super.validar();
+        if (area == null) {
+            throw new UsuarioNoValidoException("El empleado debe tener un área.");
+        }
     }
 
     @Override

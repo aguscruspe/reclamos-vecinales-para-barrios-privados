@@ -60,9 +60,8 @@ public class ReclamoService {
         }
 
         if (usuarioQueActualiza instanceof Empleado && !reclamo.estaAsignadoA(usuarioQueActualiza)) {
-                throw new UsuarioNoValidoException("Este reclamo no está asignado a usted.");
+            throw new UsuarioNoValidoException("Este reclamo no está asignado a usted.");
         }
-        
 
         reclamo.actualizarEstado(nuevoEstado,
                 observacion + " (Actualizado por: " + usuarioQueActualiza.getNombreUsuario() + ")");
@@ -74,14 +73,14 @@ public class ReclamoService {
 
     public List<Reclamo> getReclamosPorVecino(Vecino vecino) {
         return reclamos.values().stream()
-                .filter(r -> r.getVecino().getId() == vecino.getId())
+                .filter(r -> r.fueHechoPor(vecino))
                 .collect(Collectors.toList());
     }
 
     public List<Reclamo> getReclamosPorEmpleado(Empleado empleado) {
-    return reclamos.values().stream()
-            .filter(r -> r.estaAsignadoA(empleado))
-            .collect(Collectors.toList());
+        return reclamos.values().stream()
+                .filter(r -> r.estaAsignadoA(empleado))
+                .collect(Collectors.toList());
     }
 
     public List<Reclamo> getTodosLosReclamosOrdenadosPorFecha() {

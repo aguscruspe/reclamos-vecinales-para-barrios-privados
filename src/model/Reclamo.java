@@ -85,6 +85,10 @@ public class Reclamo {
     public boolean estaAsignadoA(Usuario usuario) {
         return empleadoAsignado != null && empleadoAsignado.getId() == usuario.getId();
     }
+
+    public boolean fueHechoPor(Vecino vecino) {
+        return this.vecino.getId() == vecino.getId();
+    }
     
     // Getters
     public int getId() {

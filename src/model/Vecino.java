@@ -1,5 +1,7 @@
 package model;
 
+import excepts.UsuarioNoValidoException;
+
 public class Vecino extends Usuario {
 
     private Lote lote;
@@ -16,6 +18,14 @@ public class Vecino extends Usuario {
 
     public Lote getLote() {
         return lote;
+    }
+
+    @Override
+    public void validar() throws UsuarioNoValidoException {
+        super.validar();
+        if (lote == null) {
+            throw new UsuarioNoValidoException("El vecino debe tener un lote.");
+        }
     }
 
     @Override

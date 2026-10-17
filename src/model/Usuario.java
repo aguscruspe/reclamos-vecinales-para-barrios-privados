@@ -6,11 +6,11 @@ import excepts.UsuarioNoValidoException;
 public abstract class Usuario implements IValidable {
 
     private static int contadorId = 0;
-    protected int id;
-    protected String nombreUsuario;
-    protected String password;
-    protected String nombreCompleto;
-    protected String dni;
+    private int id;
+    private String nombreUsuario;
+    private String password;
+    private String nombreCompleto;
+    private String dni;
 
     public Usuario(String nombreUsuario, String password, String nombreCompleto, String dni) {
         this.id = ++contadorId;
@@ -62,13 +62,13 @@ public abstract class Usuario implements IValidable {
                 id, nombreUsuario, nombreCompleto, getTipoUsuario());
     }
 
-     @Override
+    @Override
     public void validar() throws UsuarioNoValidoException {
         if (nombreUsuario == null || nombreUsuario.trim().isEmpty() ||
                 password == null || password.trim().isEmpty() ||
                 dni == null || dni.trim().isEmpty() ||
                 nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
-            throw new UsuarioNoValidoException("Datos incompletos para el empleado.");
+            throw new UsuarioNoValidoException("Faltan datos obligatorios del usuario.");
         }
     }
 }

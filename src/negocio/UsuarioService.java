@@ -41,8 +41,4 @@ public class UsuarioService {
     public Map<String, Usuario> getTodosLosUsuarios() {
         return this.usuarios;
     }
-
-    public Usuario getUsuarioPorUsername(String nombreUsuario) {
-        return this.usuarios.get(nombreUsuario);
-    }
 }

@@ -61,12 +61,13 @@ public class GestorPersistencia implements IRepositorio {
                 Usuario usuario = null;
                 switch (tipoUsuario) {
                     case "Vecino":
-                        Lote lote = lotes.get(Integer.parseInt(datos[6]));
+                        int numeroLote = Integer.parseInt(datos[6]);
+                        Lote lote = lotes.get(numeroLote);
                         usuario = new Vecino(id, nombreUsuario, password, nombre, dni, lote);
                         break;
                     case "Empleado":
-                        usuario = new Empleado(id, nombreUsuario, password, nombre, dni,
-                                AreaEmpleado.valueOf(datos[6]));
+                        AreaEmpleado area = AreaEmpleado.valueOf(datos[6]);
+                        usuario = new Empleado(id, nombreUsuario, password, nombre, dni, area);
                         break;
                     case "Intendente":
                         usuario = new Intendente(id, nombreUsuario, password, nombre, dni);
